@@ -1,0 +1,6 @@
+*.o
+*~
+
+# compiled binaries
+dumpatags
+genatags
