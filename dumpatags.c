@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <unistd.h>
 #include <fcntl.h>
 
 typedef unsigned int u32;
@@ -13,12 +14,11 @@ typedef unsigned char u8;
 
 unsigned char atag_buf[10240];
 
-dump_omap(struct omap_tag * omap_tag, int cnt) 
+int dump_omap(struct omap_tag * omap_tag) 
 {
     unsigned k;
     unsigned i = 0;
     while (omap_tag->hdr.size) {
-        unsigned int tag = omap_tag->hdr.tag;
         unsigned int size = omap_tag->hdr.size;
 
 
@@ -88,7 +88,7 @@ dump_omap(struct omap_tag * omap_tag, int cnt)
     return 1;
 }
 
-main(int argc, char** argv)
+int main(int argc, char** argv)
 {
     struct tag * atag;
     char *progname = *argv;
@@ -99,7 +99,8 @@ main(int argc, char** argv)
     }
 
     int cnt = read(f, atag_buf, 10000);
-    int i;
+    /* shut up compiler? :P int i; */
+    #define i argc
      
     printf("read %d bytes from %s in buffer of size 10000\n", cnt, *argv);
     i = 0;
@@ -112,7 +113,7 @@ main(int argc, char** argv)
             case ATAG_NONE: printf(" END ATAG\n");
                             break;
             case ATAG_BOARD:printf(" OMAP table (%d bytes)\n", atag->hdr.size << 2);
-                            dump_omap((struct omap_tag *) &(atag->u), (atag->hdr.size - (sizeof(atag->hdr)>>2)) << 2);
+                            dump_omap((struct omap_tag *) &(atag->u));
                             break;
             case ATAG_CORE: printf(" ATAG CORE");
                             printf(" flags=%08x", atag->u.core.flags);
